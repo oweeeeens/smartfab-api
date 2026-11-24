@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { entities } from './database/entities.js';
+import { CheckConstraintsService } from './database/check-constraints.service.js';
 
 @Module({
   imports: [
@@ -17,10 +19,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         username: config.get<string>('DB_USERNAME', 'root'),
         password: config.get<string>('DB_PASSWORD', ''),
         database: config.get<string>('DB_NAME', 'smartfab'),
-        autoLoadEntities: true,
+        entities,
         synchronize: config.get<string>('DB_SYNCHRONIZE') === 'true',
       }),
     }),
   ],
+  providers: [CheckConstraintsService],
 })
 export class AppModule {}
