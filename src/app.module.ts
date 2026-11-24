@@ -5,6 +5,7 @@ import { entities } from './database/entities.js';
 import { CheckConstraintsService } from './database/check-constraints.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
+import { MachinesModule } from './machines/machines.module.js';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UsersModule } from './users/users.module.js';
     // Feature modules
     AuthModule,
     UsersModule,
+    MachinesModule,
   ],
   providers: [CheckConstraintsService],
 })
