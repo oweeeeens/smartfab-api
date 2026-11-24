@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module.js';
 import { MachinesModule } from './machines/machines.module.js';
 import { MaintenanceRequestsModule } from './maintenance-requests/maintenance-requests.module.js';
 import { PartUsagesModule } from './part-usages/part-usages.module.js';
+import { SparePartsModule } from './spare-parts/spare-parts.module.js';
+import { ProductionLogsModule } from './production-logs/production-logs.module.js';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { PartUsagesModule } from './part-usages/part-usages.module.js';
     MachinesModule,
     MaintenanceRequestsModule,
     PartUsagesModule,
+    SparePartsModule,
+    ProductionLogsModule,
   ],
   providers: [CheckConstraintsService],
 })
