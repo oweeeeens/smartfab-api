@@ -12,7 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { Roles } from '../common/decorators/roles.decorator.js';
-import type { UserRole } from '../common/constants.js';
+import { UserQueryDto } from './dto/user-query.dto.js';
 import { UsersService } from './users.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
@@ -21,11 +21,11 @@ import { UpdateUserDto } from './dto/update-user.dto.js';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // GET /api/v1/users?role=Technician
+  // GET /api/v1/users?role=Technician&page=1&limit=20
   @Get()
   @Roles('Admin', 'Manager', 'Supervisor')
-  findAll(@Query('role') role?: UserRole) {
-    return this.usersService.findAll(role);
+  findAll(@Query() query: UserQueryDto) {
+    return this.usersService.findAll(query);
   }
 
   // GET /api/v1/users/{id}

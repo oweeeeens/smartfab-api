@@ -9,7 +9,7 @@ import bcrypt from 'bcryptjs';
 import { User } from './entities/user.entity.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
-import type { UserRole } from '../common/constants.js';
+import { UserQueryDto } from './dto/user-query.dto.js';
 
 const SALT_ROUNDS = 10;
 
@@ -20,10 +20,12 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  findAll(role?: UserRole) {
+  findAll(query: UserQueryDto) {
     return this.usersRepository.find({
-      where: role ? { role } : {},
+      where: query.role ? { role: query.role } : {},
       order: { userId: 'ASC' },
+      skip: query.skip,
+      take: query.limit,
     });
   }
 
