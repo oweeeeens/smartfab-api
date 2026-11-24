@@ -47,7 +47,15 @@ export class ProductionLogsService {
   /** Submit a shift log. The operator is the logged-in user. */
   async create(dto: CreateProductionLogDto, operatorId: number) {
     await this.ensureMachineExists(dto.machineId);
-    const log = this.logsRepository.create({ ...dto, operatorId });
+    const log = this.logsRepository.create({
+      machineId: dto.machineId,
+      operatorId,
+      shiftDate: dto.shiftDate,
+      shift: dto.shift,
+      unitsProduced: dto.unitsProduced ?? 0,
+      unitsDefective: dto.unitsDefective ?? 0,
+      downtimeMinutes: dto.downtimeMinutes ?? 0,
+    });
     this.ensureDefectsWithinOutput(log);
     const saved = await this.logsRepository.save(log);
     return this.findOne(saved.logId);

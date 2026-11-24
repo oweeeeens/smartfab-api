@@ -57,7 +57,9 @@ export class MaintenanceRequestsService {
       );
     }
     const request = this.requestsRepository.create({
-      ...dto,
+      machineId: dto.machineId,
+      issueDescription: dto.issueDescription,
+      priority: dto.priority,
       reportedBy,
       status: 'Pending',
     });
