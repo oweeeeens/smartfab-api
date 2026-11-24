@@ -6,6 +6,8 @@ import { CheckConstraintsService } from './database/check-constraints.service.js
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { MachinesModule } from './machines/machines.module.js';
+import { MaintenanceRequestsModule } from './maintenance-requests/maintenance-requests.module.js';
+import { PartUsagesModule } from './part-usages/part-usages.module.js';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { MachinesModule } from './machines/machines.module.js';
     AuthModule,
     UsersModule,
     MachinesModule,
+    MaintenanceRequestsModule,
+    PartUsagesModule,
   ],
   providers: [CheckConstraintsService],
 })
