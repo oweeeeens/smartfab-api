@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { entities } from './database/entities.js';
 import { CheckConstraintsService } from './database/check-constraints.service.js';
+import { AuthModule } from './auth/auth.module.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [
@@ -23,6 +25,10 @@ import { CheckConstraintsService } from './database/check-constraints.service.js
         synchronize: config.get<string>('DB_SYNCHRONIZE') === 'true',
       }),
     }),
+
+    // Feature modules
+    AuthModule,
+    UsersModule,
   ],
   providers: [CheckConstraintsService],
 })
