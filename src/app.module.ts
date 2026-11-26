@@ -10,6 +10,7 @@ import { MaintenanceRequestsModule } from './maintenance-requests/maintenance-re
 import { PartUsagesModule } from './part-usages/part-usages.module.js';
 import { SparePartsModule } from './spare-parts/spare-parts.module.js';
 import { ProductionLogsModule } from './production-logs/production-logs.module.js';
+import { ProductionLinesModule } from './production-lines/production-lines.module.js';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ProductionLogsModule } from './production-logs/production-logs.module.j
     PartUsagesModule,
     SparePartsModule,
     ProductionLogsModule,
+    ProductionLinesModule,
   ],
   providers: [CheckConstraintsService],
 })

@@ -15,6 +15,9 @@ import { ProductionLine } from '../production-lines/entities/production-line.ent
 import { Machine } from '../machines/entities/machine.entity.js';
 import { MaintenanceSchedule } from '../maintenance-schedules/entities/maintenance-schedule.entity.js';
 import { SparePart } from '../spare-parts/entities/spare-part.entity.js';
+import { MaintenanceRequest } from '../maintenance-requests/entities/maintenance-request.entity.js';
+import { PartUsage } from '../part-usages/entities/part-usage.entity.js';
+import { ProductionLog } from '../production-logs/entities/production-log.entity.js';
 
 if (existsSync('.env')) process.loadEnvFile('.env');
 
@@ -42,7 +45,7 @@ async function seed() {
   const password = process.env.SEED_DEFAULT_PASSWORD ?? 'ChangeMe123!';
   const passwordHash = await bcrypt.hash(password, 10);
 
-  const [, supervisor] = await users.save([
+  const [, supervisor, operator, technician] = await users.save([
     {
       firstName: 'System',
       lastName: 'Admin',
@@ -96,32 +99,34 @@ async function seed() {
     },
   ]);
 
-  const [lathe, press] = await dataSource.getRepository(Machine).save([
-    {
-      lineId: lineB.lineId,
-      machineName: 'CNC Lathe 1',
-      model: 'HL-200',
-      serialNumber: 'SN-88231',
-      status: 'Running',
-      installationDate: '2024-03-10',
-    },
-    {
-      lineId: lineB.lineId,
-      machineName: 'Press 3',
-      model: 'HP-50',
-      serialNumber: 'SN-77120',
-      status: 'Idle',
-      installationDate: '2023-11-02',
-    },
-    {
-      lineId: lineA.lineId,
-      machineName: 'Conveyor 1',
-      model: 'CV-10',
-      serialNumber: 'SN-55001',
-      status: 'Running',
-      installationDate: '2022-06-15',
-    },
-  ]);
+  const [lathe, press, conveyor] = await dataSource
+    .getRepository(Machine)
+    .save([
+      {
+        lineId: lineB.lineId,
+        machineName: 'CNC Lathe 1',
+        model: 'HL-200',
+        serialNumber: 'SN-88231',
+        status: 'Running',
+        installationDate: '2024-03-10',
+      },
+      {
+        lineId: lineB.lineId,
+        machineName: 'Press 3',
+        model: 'HP-50',
+        serialNumber: 'SN-77120',
+        status: 'Down',
+        installationDate: '2023-11-02',
+      },
+      {
+        lineId: lineA.lineId,
+        machineName: 'Conveyor 1',
+        model: 'CV-10',
+        serialNumber: 'SN-55001',
+        status: 'Running',
+        installationDate: '2022-06-15',
+      },
+    ]);
 
   await dataSource.getRepository(MaintenanceSchedule).save([
     {
@@ -139,7 +144,7 @@ async function seed() {
     },
   ]);
 
-  await dataSource.getRepository(SparePart).save([
+  const [bearing, belt] = await dataSource.getRepository(SparePart).save([
     {
       partName: 'Spindle Bearing',
       partNumber: 'BRG-6205',
@@ -160,6 +165,85 @@ async function seed() {
       quantityOnHand: 8,
       reorderLevel: 2,
       unitCost: 1200.0,
+    },
+  ]);
+
+  // Sample activity so the dashboard and lists have something to show
+  const requests = dataSource.getRepository(MaintenanceRequest);
+  await requests.save([
+    {
+      machineId: press.machineId,
+      reportedBy: operator.userId,
+      issueDescription:
+        'Hydraulic pressure drops during stamping; machine stopped.',
+      priority: 'Critical',
+      status: 'Pending',
+    },
+    {
+      machineId: lathe.machineId,
+      reportedBy: operator.userId,
+      assignedTo: technician.userId,
+      issueDescription: 'Spindle overheating after 2 hours of operation.',
+      priority: 'High',
+      status: 'In Progress',
+    },
+  ]);
+  const completed = await requests.save({
+    machineId: conveyor.machineId,
+    reportedBy: supervisor.userId,
+    assignedTo: technician.userId,
+    issueDescription: 'Conveyor belt slipping at the loading end.',
+    priority: 'Medium',
+    status: 'Completed',
+    dateCompleted: new Date(),
+  });
+  await dataSource.getRepository(PartUsage).save([
+    { requestId: completed.requestId, partId: belt.partId, quantityUsed: 1 },
+    { requestId: completed.requestId, partId: bearing.partId, quantityUsed: 2 },
+  ]);
+
+  const day = (offset: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() - offset);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 10);
+  };
+  await dataSource.getRepository(ProductionLog).save([
+    {
+      machineId: lathe.machineId,
+      operatorId: operator.userId,
+      shiftDate: day(0),
+      shift: 'Morning',
+      unitsProduced: 480,
+      unitsDefective: 6,
+      downtimeMinutes: 15,
+    },
+    {
+      machineId: conveyor.machineId,
+      operatorId: operator.userId,
+      shiftDate: day(0),
+      shift: 'Morning',
+      unitsProduced: 1250,
+      unitsDefective: 3,
+      downtimeMinutes: 0,
+    },
+    {
+      machineId: press.machineId,
+      operatorId: operator.userId,
+      shiftDate: day(1),
+      shift: 'Afternoon',
+      unitsProduced: 310,
+      unitsDefective: 12,
+      downtimeMinutes: 95,
+    },
+    {
+      machineId: lathe.machineId,
+      operatorId: operator.userId,
+      shiftDate: day(1),
+      shift: 'Morning',
+      unitsProduced: 455,
+      unitsDefective: 9,
+      downtimeMinutes: 30,
     },
   ]);
 

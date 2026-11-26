@@ -52,7 +52,7 @@ CREATE TABLE `machine` (
 
 LOCK TABLES `machine` WRITE;
 /*!40000 ALTER TABLE `machine` DISABLE KEYS */;
-INSERT INTO `machine` VALUES (1,2,'CNC Lathe 1','HL-200','SN-88231','Running','2024-03-10'),(2,2,'Press 3','HP-50','SN-77120','Idle','2023-11-02'),(3,1,'Conveyor 1','CV-10','SN-55001','Running','2022-06-15');
+INSERT INTO `machine` VALUES (1,2,'CNC Lathe 1','HL-200','SN-88231','Running','2024-03-10'),(2,2,'Press 3','HP-50','SN-77120','Down','2023-11-02'),(3,1,'Conveyor 1','CV-10','SN-55001','Running','2022-06-15');
 /*!40000 ALTER TABLE `machine` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -82,7 +82,7 @@ CREATE TABLE `maintenancerequest` (
   CONSTRAINT `FK_cc888930c8475753e27ba0b2ed1` FOREIGN KEY (`MachineID`) REFERENCES `machine` (`MachineID`) ON UPDATE NO ACTION,
   CONSTRAINT `CHK_MaintenanceRequest_Status` CHECK (`Status` in ('Pending','In Progress','Completed','Cancelled')),
   CONSTRAINT `CHK_MaintenanceRequest_Priority` CHECK (`Priority` in ('Low','Medium','High','Critical'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -91,6 +91,7 @@ CREATE TABLE `maintenancerequest` (
 
 LOCK TABLES `maintenancerequest` WRITE;
 /*!40000 ALTER TABLE `maintenancerequest` DISABLE KEYS */;
+INSERT INTO `maintenancerequest` VALUES (1,2,3,NULL,'Hydraulic pressure drops during stamping; machine stopped.','Critical','Pending','2026-11-26 15:23:51',NULL),(2,1,3,4,'Spindle overheating after 2 hours of operation.','High','In Progress','2026-11-26 15:23:51',NULL),(3,3,2,4,'Conveyor belt slipping at the loading end.','Medium','Completed','2026-11-26 15:23:51','2026-11-26 15:23:51');
 /*!40000 ALTER TABLE `maintenancerequest` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,7 +145,7 @@ CREATE TABLE `partusage` (
   CONSTRAINT `FK_4e42b4bfb6930fb316aa0c5f8bf` FOREIGN KEY (`RequestID`) REFERENCES `maintenancerequest` (`RequestID`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_7b6a3e2b5ffcdfffc5a9632cf54` FOREIGN KEY (`PartID`) REFERENCES `sparepart` (`PartID`) ON UPDATE NO ACTION,
   CONSTRAINT `CHK_PartUsage_Quantity` CHECK (`QuantityUsed` > 0)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -153,6 +154,7 @@ CREATE TABLE `partusage` (
 
 LOCK TABLES `partusage` WRITE;
 /*!40000 ALTER TABLE `partusage` DISABLE KEYS */;
+INSERT INTO `partusage` VALUES (1,3,2,1,'2026-11-26 15:23:51'),(2,3,1,2,'2026-11-26 15:23:51');
 /*!40000 ALTER TABLE `partusage` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -210,7 +212,7 @@ CREATE TABLE `productionlog` (
   CONSTRAINT `CHK_ProductionLog_UnitsDefective` CHECK (`UnitsDefective` >= 0),
   CONSTRAINT `CHK_ProductionLog_UnitsProduced` CHECK (`UnitsProduced` >= 0),
   CONSTRAINT `CHK_ProductionLog_Shift` CHECK (`Shift` in ('Morning','Afternoon','Night'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -219,6 +221,7 @@ CREATE TABLE `productionlog` (
 
 LOCK TABLES `productionlog` WRITE;
 /*!40000 ALTER TABLE `productionlog` DISABLE KEYS */;
+INSERT INTO `productionlog` VALUES (1,1,3,'2026-11-26','Morning',480,6,15),(2,3,3,'2026-11-26','Morning',1250,3,0),(3,2,3,'2026-11-25','Afternoon',310,12,95),(4,1,3,'2026-11-25','Morning',455,9,30);
 /*!40000 ALTER TABLE `productionlog` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -282,7 +285,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'System','Admin','admin@smartfab.com','$2b$10$lS1ZFNPrkgXPLBshfTU2J.A8ENzJm5HRHMd9fguBdRAL8/vzGEwPK','Admin',NULL,'2026-11-24 10:58:38'),(2,'Maria','Santos','supervisor@smartfab.com','$2b$10$lS1ZFNPrkgXPLBshfTU2J.A8ENzJm5HRHMd9fguBdRAL8/vzGEwPK','Supervisor','09170000001','2026-11-24 10:58:38'),(3,'Juan','Dela Cruz','operator@smartfab.com','$2b$10$lS1ZFNPrkgXPLBshfTU2J.A8ENzJm5HRHMd9fguBdRAL8/vzGEwPK','Operator','09170000002','2026-11-24 10:58:38'),(4,'Ana','Reyes','technician@smartfab.com','$2b$10$lS1ZFNPrkgXPLBshfTU2J.A8ENzJm5HRHMd9fguBdRAL8/vzGEwPK','Technician','09170000003','2026-11-24 10:58:38'),(5,'Carlo','Mendoza','manager@smartfab.com','$2b$10$lS1ZFNPrkgXPLBshfTU2J.A8ENzJm5HRHMd9fguBdRAL8/vzGEwPK','Manager',NULL,'2026-11-24 10:58:38');
+INSERT INTO `user` VALUES (1,'System','Admin','admin@smartfab.com','$2b$10$sVYJ4CBL9D62Lv0Am9P5WOTzWxpG6ySIsMxrme88hvTaVPJQ5s9QO','Admin',NULL,'2026-11-26 15:23:51'),(2,'Maria','Santos','supervisor@smartfab.com','$2b$10$sVYJ4CBL9D62Lv0Am9P5WOTzWxpG6ySIsMxrme88hvTaVPJQ5s9QO','Supervisor','09170000001','2026-11-26 15:23:51'),(3,'Juan','Dela Cruz','operator@smartfab.com','$2b$10$sVYJ4CBL9D62Lv0Am9P5WOTzWxpG6ySIsMxrme88hvTaVPJQ5s9QO','Operator','09170000002','2026-11-26 15:23:51'),(4,'Ana','Reyes','technician@smartfab.com','$2b$10$sVYJ4CBL9D62Lv0Am9P5WOTzWxpG6ySIsMxrme88hvTaVPJQ5s9QO','Technician','09170000003','2026-11-26 15:23:51'),(5,'Carlo','Mendoza','manager@smartfab.com','$2b$10$sVYJ4CBL9D62Lv0Am9P5WOTzWxpG6ySIsMxrme88hvTaVPJQ5s9QO','Manager',NULL,'2026-11-26 15:23:51');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

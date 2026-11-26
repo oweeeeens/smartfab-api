@@ -32,7 +32,7 @@ export class ProductionLogsController {
   // GET /api/v1/production-logs/{id}
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.logsService.findOne(id);
+    return this.logsService.findOneDetailed(id);
   }
 
   // POST /api/v1/production-logs -> 201 Created (operators submit their shift)

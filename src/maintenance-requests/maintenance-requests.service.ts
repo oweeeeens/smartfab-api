@@ -11,6 +11,27 @@ import { User } from '../users/entities/user.entity.js';
 import { CreateMaintenanceRequestDto } from './dto/create-maintenance-request.dto.js';
 import { UpdateMaintenanceRequestDto } from './dto/update-maintenance-request.dto.js';
 import { MaintenanceRequestQueryDto } from './dto/maintenance-request-query.dto.js';
+import { toMachineRef, toUserRef } from '../common/refs.js';
+
+const DETAIL_RELATIONS = { machine: true, reporter: true, assignee: true };
+
+/** API response: the request's own columns plus short machine/user summaries. */
+function toResponse(request: MaintenanceRequest) {
+  return {
+    requestId: request.requestId,
+    machineId: request.machineId,
+    reportedBy: request.reportedBy,
+    assignedTo: request.assignedTo,
+    issueDescription: request.issueDescription,
+    priority: request.priority,
+    status: request.status,
+    dateReported: request.dateReported,
+    dateCompleted: request.dateCompleted,
+    machine: toMachineRef(request.machine),
+    reporter: toUserRef(request.reporter),
+    assignee: toUserRef(request.assignee),
+  };
+}
 
 @Injectable()
 export class MaintenanceRequestsService {
@@ -23,20 +44,37 @@ export class MaintenanceRequestsService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  findAll(query: MaintenanceRequestQueryDto) {
-    return this.requestsRepository.find({
+  async findAll(query: MaintenanceRequestQueryDto) {
+    const requests = await this.requestsRepository.find({
       where: {
         ...(query.status && { status: query.status }),
         ...(query.priority && { priority: query.priority }),
         ...(query.machineId && { machineId: query.machineId }),
         ...(query.assignedTo && { assignedTo: query.assignedTo }),
       },
+      relations: DETAIL_RELATIONS,
       order: { requestId: 'DESC' }, // newest first
       skip: query.skip,
       take: query.limit,
     });
+    return requests.map(toResponse);
   }
 
+  /** One request with the machine, reporter and assignee names (for API responses). */
+  async findOneDetailed(requestId: number) {
+    const request = await this.requestsRepository.findOne({
+      where: { requestId },
+      relations: DETAIL_RELATIONS,
+    });
+    if (!request) {
+      throw new NotFoundException(
+        `No maintenance request exists with ID ${requestId}.`,
+      );
+    }
+    return toResponse(request);
+  }
+
+  /** The plain entity (no relations), used internally before updates. */
   async findOne(requestId: number) {
     const request = await this.requestsRepository.findOneBy({ requestId });
     if (!request) {
@@ -64,7 +102,7 @@ export class MaintenanceRequestsService {
       status: 'Pending',
     });
     const saved = await this.requestsRepository.save(request);
-    return this.findOne(saved.requestId);
+    return this.findOneDetailed(saved.requestId);
   }
 
   /** Assign a technician and/or update the status, priority or description. */
@@ -83,7 +121,7 @@ export class MaintenanceRequestsService {
     }
 
     await this.requestsRepository.save(request);
-    return this.findOne(requestId);
+    return this.findOneDetailed(requestId);
   }
 
   /** Deletes the request; its PartUsage rows are removed by ON DELETE CASCADE. */

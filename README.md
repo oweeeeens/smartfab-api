@@ -33,7 +33,7 @@ src/
 ├── part-usages/                # Parts used per repair (nested under maintenance requests)
 ├── spare-parts/                # Spare-parts inventory
 ├── production-logs/            # Shift output / downtime logs
-├── production-lines/           # ProductionLine entity
+├── production-lines/           # Production lines (read-only list)
 ├── maintenance-schedules/      # MaintenanceSchedule entity
 ├── common/                     # Decorators (@Public, @Roles, @CurrentUser), DTOs, error filter
 └── database/                   # Entity list, CHECK constraints, seed script
@@ -141,6 +141,7 @@ The base URL is `/api/v1`. Every endpoint except login requires the header `Auth
 | 28 | POST | `/production-logs` | Submit a shift log | Operator |
 | 29 | PATCH | `/production-logs/{id}` | Correct a log (operators can edit only their own) | Operator, Supervisor, Admin |
 | 30 | DELETE | `/production-logs/{id}` | Delete a log | Supervisor, Admin |
+| 31 | GET | `/production-lines` | List production lines (for forms and filters) | Any |
 
 ### Status codes
 

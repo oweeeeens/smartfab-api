@@ -12,6 +12,25 @@ import { CreateProductionLogDto } from './dto/create-production-log.dto.js';
 import { UpdateProductionLogDto } from './dto/update-production-log.dto.js';
 import { ProductionLogQueryDto } from './dto/production-log-query.dto.js';
 import type { AuthUser } from '../common/decorators/current-user.decorator.js';
+import { toMachineRef, toUserRef } from '../common/refs.js';
+
+const DETAIL_RELATIONS = { machine: true, operator: true };
+
+/** API response: the log's own columns plus short machine/operator summaries. */
+function toResponse(log: ProductionLog) {
+  return {
+    logId: log.logId,
+    machineId: log.machineId,
+    operatorId: log.operatorId,
+    shiftDate: log.shiftDate,
+    shift: log.shift,
+    unitsProduced: log.unitsProduced,
+    unitsDefective: log.unitsDefective,
+    downtimeMinutes: log.downtimeMinutes,
+    machine: toMachineRef(log.machine),
+    operator: toUserRef(log.operator),
+  };
+}
 
 @Injectable()
 export class ProductionLogsService {
@@ -22,20 +41,35 @@ export class ProductionLogsService {
     private readonly machinesRepository: Repository<Machine>,
   ) {}
 
-  findAll(query: ProductionLogQueryDto) {
-    return this.logsRepository.find({
+  async findAll(query: ProductionLogQueryDto) {
+    const logs = await this.logsRepository.find({
       where: {
         ...(query.machineId && { machineId: query.machineId }),
         ...(query.operatorId && { operatorId: query.operatorId }),
         ...(query.shiftDate && { shiftDate: query.shiftDate }),
         ...(query.shift && { shift: query.shift }),
       },
+      relations: DETAIL_RELATIONS,
       order: { shiftDate: 'DESC', logId: 'DESC' },
       skip: query.skip,
       take: query.limit,
     });
+    return logs.map(toResponse);
   }
 
+  /** One log with machine and operator names (for API responses). */
+  async findOneDetailed(logId: number) {
+    const log = await this.logsRepository.findOne({
+      where: { logId },
+      relations: DETAIL_RELATIONS,
+    });
+    if (!log) {
+      throw new NotFoundException(`No production log exists with ID ${logId}.`);
+    }
+    return toResponse(log);
+  }
+
+  /** The plain entity (no relations), used internally before updates. */
   async findOne(logId: number) {
     const log = await this.logsRepository.findOneBy({ logId });
     if (!log) {
@@ -58,7 +92,7 @@ export class ProductionLogsService {
     });
     this.ensureDefectsWithinOutput(log);
     const saved = await this.logsRepository.save(log);
-    return this.findOne(saved.logId);
+    return this.findOneDetailed(saved.logId);
   }
 
   async update(logId: number, dto: UpdateProductionLogDto, user: AuthUser) {
@@ -73,7 +107,7 @@ export class ProductionLogsService {
     Object.assign(log, dto);
     this.ensureDefectsWithinOutput(log);
     await this.logsRepository.save(log);
-    return this.findOne(logId);
+    return this.findOneDetailed(logId);
   }
 
   async remove(logId: number) {

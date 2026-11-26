@@ -32,7 +32,7 @@ export class MaintenanceRequestsController {
   // GET /api/v1/maintenance-requests/{id}
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.requestsService.findOne(id);
+    return this.requestsService.findOneDetailed(id);
   }
 
   // POST /api/v1/maintenance-requests -> 201 Created (report an issue)

@@ -775,6 +775,44 @@
       "name": "Machines",
       "item": [
         {
+          "name": "Get production lines",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Returns a list of lines\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/production-lines",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "production-lines"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{operatorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Create machine",
           "event": [
             {
@@ -1354,7 +1392,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));"
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Includes machine and reporter names\", () => { const b = pm.response.json(); pm.expect(b.machine.machineName).to.be.a(\"string\"); pm.expect(b.reporter.firstName).to.be.a(\"string\"); });"
                 ]
               }
             }
