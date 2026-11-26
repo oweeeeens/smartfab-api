@@ -75,7 +75,7 @@ Each feature module follows the same layers: **Controller** (HTTP routes and DTO
    | `DB_SYNCHRONIZE` | `true` in development: creates the tables from the entities |
    | `JWT_SECRET` | Long random string used to sign tokens |
    | `JWT_EXPIRES_IN` | Token lifetime, for example `1h` |
-   | `SEED_DEFAULT_PASSWORD` | Password given to the demo accounts created by the seed |
+   | `SEED_DEFAULT_PASSWORD` | Password you choose for the demo accounts created by the seed (required, at least 8 characters) |
 
 4. Create the tables and the demo data:
 
@@ -95,7 +95,7 @@ Each feature module follows the same layers: **Controller** (HTTP routes and DTO
 
 ### Demo accounts (from the seed)
 
-All demo accounts use `SEED_DEFAULT_PASSWORD`.
+All demo accounts use the password you set in `SEED_DEFAULT_PASSWORD`.
 
 | Email | Role |
 | --- | --- |
@@ -173,7 +173,9 @@ Every error uses the same body:
 
 ## Testing with Postman
 
-Import `postman/SmartFab.postman_collection.json`. Run the **Auth** folder first: it logs in each demo role and saves the tokens into collection variables.
+Import `postman/SmartFab.postman_collection.json`. Once, before the first run, open the collection's **Variables** tab and set `seedPassword` to the `SEED_DEFAULT_PASSWORD` from your `.env`. The password is not stored in the repository.
+
+Run the **Auth** folder first: it logs in each demo role and saves the tokens into collection variables.
 
 On a freshly seeded database, you can run the whole collection from top to bottom with the Collection Runner. Every request has a test that checks the expected status code.
 

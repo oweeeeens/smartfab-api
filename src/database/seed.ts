@@ -42,7 +42,13 @@ async function seed() {
     return;
   }
 
-  const password = process.env.SEED_DEFAULT_PASSWORD ?? 'ChangeMe123!';
+  // No default in the code: the demo password must come from .env
+  const password = process.env.SEED_DEFAULT_PASSWORD ?? '';
+  if (password.length < 8) {
+    throw new Error(
+      'Set SEED_DEFAULT_PASSWORD in .env (at least 8 characters) before running the seed.',
+    );
+  }
   const passwordHash = await bcrypt.hash(password, 10);
 
   const [, supervisor, operator, technician] = await users.save([

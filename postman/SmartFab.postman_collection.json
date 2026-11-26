@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "SmartFab API",
-    "description": "SmartFab: Production Monitoring and Equipment Maintenance System — REST API (/api/v1).\n\nRun the \"Auth\" folder first: it logs in each seeded role and stores the tokens. The whole collection can be run top-to-bottom with the Collection Runner on a freshly seeded database (npm run seed).",
+    "description": "SmartFab: Production Monitoring and Equipment Maintenance System — REST API (/api/v1).\n\nBefore the first run, open the collection Variables tab and set seedPassword to the SEED_DEFAULT_PASSWORD from your .env. Then run the \"Auth\" folder first: it logs in each seeded role and stores the tokens. The whole collection can be run top-to-bottom with the Collection Runner on a freshly seeded database (npm run seed).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -11,7 +11,7 @@
     },
     {
       "key": "seedPassword",
-      "value": "ChangeMe123!"
+      "value": ""
     },
     {
       "key": "adminToken",
